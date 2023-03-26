@@ -240,7 +240,8 @@
         </v-card>
       </v-col>
       <v-col style="margin-left: -10px" cols="12" sm="5">
-        <v-card style="margin-top: 13%" :loading="loadingTable" color="#1e1e1e">
+        <h2 class="white--text my-4">Alert Strem</h2>
+        <v-card style="margin-top: 5%" :loading="loadingTable" color="#1e1e1e">
           <template slot="progress">
             <v-progress-linear color="green" indeterminate></v-progress-linear>
           </template>
