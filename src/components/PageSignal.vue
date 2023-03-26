@@ -34,8 +34,9 @@
             :loading="loadingTable"
             class="elevation-1"
             sort-by="calories"
-            :items-per-page="10"
-            :footer-props="{ 'items-per-page-options': [10, -1] }"
+            :items-per-page="15"
+            :footer-props="{ 'items-per-page-options': [15] }"
+            :hide-actions="items.length === 1"
             :page="1"
             :headers="headers"
             :items="items"
@@ -230,6 +231,10 @@
                 </tr>
               </tbody>
             </template>
+
+            <template #footer>
+              <v-spacer />
+            </template>
           </v-data-table>
           <Popup ref="formCoin"></Popup>
         </v-card>
@@ -304,6 +309,7 @@
 </template>
 
 <script>
+const TIME_REFRESH = 5 * 60 * 1000;
 import Popup from "./Popup.vue";
 import axios from "axios";
 
@@ -347,6 +353,15 @@ export default {
     ],
     items: [],
   }),
+  created() {
+    this.interval = setInterval(() => {
+      this.fetchData();
+    }, TIME_REFRESH);
+    this.fetchData();
+  },
+  beforeDestroy() {
+    this.interval = clearInterval(this.interval);
+  },
   methods: {
     showPopup(item) {
       const data = axios.post(
@@ -438,60 +453,61 @@ export default {
         ".png"
       );
     },
-  },
-  created() {
-    this.loadingTable = true;
-    axios
-      .post("https://app.fidata.pro/api/quantifycrypto-signal")
-      .then(async (response) => {
-        const data1 = [...response.data];
-        const newRes = await axios.post(
-          "https://app.fidata.pro/api/quantifycrypto-coin"
-        );
-        const data2 = [...newRes.data];
-        const dataRel = data1.map((x) => ({
-          ...x,
-          ...data2.find((e) => x.coin_symbol == e.coin_symbol),
-        }));
-        console.log("data", dataRel);
+    fetchData() {
+      this.loadingTable = true;
+      axios
+        .post("https://app.fidata.pro/api/quantifycrypto-signal")
+        .then(async (response) => {
+          const data1 = [...response.data];
+          const newRes = await axios.post(
+            "https://app.fidata.pro/api/quantifycrypto-coin"
+          );
+          const data2 = [...newRes.data];
+          const dataRel = data1.map((x) => ({
+            ...x,
+            ...data2.find((e) => x.coin_symbol == e.coin_symbol),
+          }));
+          console.log("data", dataRel);
 
-        // lay gia tri thoi gian moi nhat qua updated_at
-        let maxObj = dataRel.sort((a, b) => {
-          let timestampA = new Date(a.timestamp).getTime();
-          let timestampB = new Date(b.timestamp).getTime();
-          return timestampB - timestampA;
+          // lay gia tri thoi gian moi nhat qua updated_at
+          let maxObj = dataRel.sort((a, b) => {
+            let timestampA = new Date(a.timestamp).getTime();
+            let timestampB = new Date(b.timestamp).getTime();
+            return timestampB - timestampA;
+          });
+
+          // // Lấy ra đối tượng có giá trị timestamp lớn nhất
+          let maxTimestampObject = maxObj.pop();
+          console.log(maxTimestampObject, 1111);
+
+          // // tạo khoa tim kiem theo gia tri moi nhat//
+
+          let cutStr = maxTimestampObject.updated_at;
+          let searchKey = cutStr.substring(0, 16);
+          console.log(searchKey, 222222);
+
+          // // lay mang 300 coin theo gia tri //
+          let filteredCoin = dataRel.filter((item) => {
+            return item.updated_at.includes(searchKey);
+          });
+          // console.log(filteredCoin, 33333);
+          let uniqueArr = filteredCoin.filter(
+            (obj, index, self) =>
+              index ===
+                self.findIndex((t) => t.coin_symbol === obj.coin_symbol) ||
+              index === self.findIndex((t) => t.type === obj.type)
+          );
+
+          this.items = uniqueArr;
+          // console.log(this.items, 222);
+          this.loadingTable = false;
+        })
+        .catch((error) => {
+          this.errorMessage = error.message;
+          console.error("There was an error!", error);
+          this.loadingTable = false;
         });
-
-        // // Lấy ra đối tượng có giá trị timestamp lớn nhất
-        let maxTimestampObject = maxObj.pop();
-        console.log(maxTimestampObject, 1111);
-
-        // // tạo khoa tim kiem theo gia tri moi nhat//
-
-        let cutStr = maxTimestampObject.updated_at;
-        let searchKey = cutStr.substring(0, 16);
-        console.log(searchKey, 222222);
-
-        // // lay mang 300 coin theo gia tri //
-        let filteredCoin = dataRel.filter((item) => {
-          return item.updated_at.includes(searchKey);
-        });
-        // console.log(filteredCoin, 33333);
-        let uniqueArr = filteredCoin.filter(
-          (obj, index, self) =>
-            index ===
-              self.findIndex((t) => t.coin_symbol === obj.coin_symbol) ||
-            index === self.findIndex((t) => t.type === obj.type)
-        );
-
-        this.items = uniqueArr;
-        // console.log(this.items, 222);
-        this.loadingTable = false;
-      })
-      .catch((error) => {
-        this.errorMessage = error.message;
-        console.error("There was an error!", error);
-      });
+    },
   },
 };
 </script>

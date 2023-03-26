@@ -5,12 +5,16 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "dependencies": {
     "axios": "^1.3.4",
     "chart.js": "^3.7.1",
     "core-js": "^3.6.5",
+    "firebase": "^9.18.0",
+    "gh-pages": "^5.0.0",
     "highcharts": "^10.3.3",
     "highcharts-more": "^0.1.7",
     "highcharts-vue": "^1.4.0",
@@ -38,6 +42,7 @@
     "vue-template-compiler": "^2.6.11",
     "vuetify-loader": "^1.7.0"
   },
+  "homepage": "https://chiench.github.io/test-demo-singal-popup",
   "eslintConfig": {
     "root": true,
     "env": {
