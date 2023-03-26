@@ -34,8 +34,8 @@
             :loading="loadingTable"
             class="elevation-1"
             sort-by="calories"
-            :items-per-page="15"
-            :footer-props="{ 'items-per-page-options': [15] }"
+            :items-per-page="30"
+            :footer-props="{ 'items-per-page-options': [20] }"
             :hide-actions="items.length === 1"
             :page="1"
             :headers="headers"
@@ -54,7 +54,7 @@
             <template v-slot:body="{ items }">
               <tbody>
                 <tr v-for="(item, index) in items" :key="index">
-                  <td v-if="index % 3 === 0" rowspan="3">
+                  <td class="text-row" v-if="index % 3 === 0" rowspan="3">
                     <v-tooltip top>
                       <template v-slot:activator="{ on, attrs }">
                         <div
@@ -136,9 +136,18 @@
                     </v-tooltip>
                   </td>
                   <!-- <td v-else >{{ item.name }}</td> -->
-                  <td>{{ item.type }}</td>
+                  <td class="text-row" v-if="index % 3 === 0">TREND</td>
+                  <td class="text-row" v-else-if="(index - 1) % 3 === 0">
+                    MACD
+                  </td>
+                  <td
+                    class="text-row"
+                    v-else-if="(index + 1) % 3 === 0 || index % 2 === 0"
+                  >
+                    RSI
+                  </td>
 
-                  <td>
+                  <td class="text-row">
                     <span :class="getColor(getState(item.signals, `24h`))">
                       <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
@@ -153,7 +162,7 @@
                       </v-tooltip>
                     </span>
                   </td>
-                  <td>
+                  <td class="text-row">
                     <span :class="getColor(getState(item.signals, `4h`))">
                       <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
@@ -168,7 +177,7 @@
                       </v-tooltip>
                     </span>
                   </td>
-                  <td>
+                  <td class="text-row">
                     <span :class="getColor(getState(item.signals, `1h`))">
                       <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
@@ -183,7 +192,7 @@
                       </v-tooltip>
                     </span>
                   </td>
-                  <td>
+                  <td class="text-row">
                     <span :class="getColor(getState(item.signals, `30min`))">
                       <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
@@ -198,7 +207,7 @@
                       </v-tooltip>
                     </span>
                   </td>
-                  <td>
+                  <td class="text-row">
                     <span :class="getColor(getState(item.signals, `15min`))">
                       <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
@@ -213,7 +222,7 @@
                       </v-tooltip>
                     </span>
                   </td>
-                  <td>
+                  <td class="text-row">
                     <span :class="getColor(getState(item.signals, `5min`))">
                       <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
@@ -277,8 +286,8 @@
             <template v-slot:body="{ items }">
               <tbody>
                 <tr v-for="(item, index) in items" :key="index">
-                  <td>{{ item.coin_symbol }}</td>
-                  <td>
+                  <td class="text-row">{{ item.coin_symbol }}</td>
+                  <td class="text-row">
                     <span :class="getColor(getState(item.signals, `24h`))">
                       <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
@@ -294,11 +303,13 @@
                     </span>
                   </td>
 
-                  <td>{{ item.type }}</td>
+                  <td class="text-row">{{ item.type }}</td>
 
-                  <td>{{ getRandom() }}</td>
-                  <td>${{ getPrice(item.coin_price) }}</td>
-                  <td>{{ getTimeTableRight(item.updated_at) }}</td>
+                  <td class="text-row">{{ getRandom() }}</td>
+                  <td class="text-row">${{ getPrice(item.coin_price) }}</td>
+                  <td class="text-row">
+                    {{ getTimeTableRight(item.updated_at) }}
+                  </td>
                 </tr>
               </tbody>
             </template>
@@ -430,11 +441,11 @@ export default {
       const year = date.getUTCFullYear();
       const hour = date.getUTCHours();
       const minute = date.getUTCMinutes();
-      const timeZoneOffset = date.getTimezoneOffset() / 60; // Chuyển đổi sang giờ
+      // const timeZoneOffset = date.getTimezoneOffset() / 60; // Chuyển đổi sang giờ
 
       const formattedDate = `${month}/${day}/${year}, ${hour}:${minute} ${
         hour >= 12 ? "pm" : "am"
-      } GMT${timeZoneOffset >= 0 ? "+" : "-"}${Math.abs(timeZoneOffset)}`;
+      } GMT+0`;
       return formattedDate;
     },
     getColor(state) {
@@ -460,6 +471,7 @@ export default {
         .post("https://app.fidata.pro/api/quantifycrypto-signal")
         .then(async (response) => {
           const data1 = [...response.data];
+          console.log(data1, "<= data1");
           const newRes = await axios.post(
             "https://app.fidata.pro/api/quantifycrypto-coin"
           );
@@ -526,5 +538,8 @@ export default {
 }
 .coin-name:hover {
   cursor: pointer;
+}
+.text-row {
+  font-size: 12px !important;
 }
 </style>
