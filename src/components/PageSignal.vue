@@ -28,6 +28,7 @@
           </v-card-title>
           <v-data-table
             v-else
+            height="768px"
             :search="search"
             dark
             dense
@@ -35,8 +36,7 @@
             class="elevation-1"
             sort-by="calories"
             :items-per-page="30"
-            :footer-props="{ 'items-per-page-options': [20] }"
-            :hide-actions="items.length === 1"
+            :footer-props="{ 'items-per-page-options': [30] }"
             :page="1"
             :headers="headers"
             :items="items"
@@ -241,9 +241,9 @@
               </tbody>
             </template>
 
-            <template #footer>
+            <!-- <template #footer>
               <v-spacer />
-            </template>
+            </template> -->
           </v-data-table>
           <Popup ref="formCoin"></Popup>
         </v-card>
@@ -334,14 +334,14 @@ export default {
 
     loadingTable: false,
     headers: [
-      { sortable: true, text: "", value: "symbol_name", width: "180px" },
-      { sortable: true, text: "", value: "type", width: "20px" },
-      { sortable: false, text: "24H", width: "20px", align: "center" },
-      { sortable: false, text: "4H", width: "20px", align: "center" },
-      { sortable: false, text: "1H", width: "20px", align: "center" },
-      { sortable: false, text: "30 Min", width: "20px", align: "center" },
-      { sortable: false, text: "15 Min", width: "20px", align: "center" },
-      { sortable: false, text: "5 Min", width: "20px", align: "center" },
+      { sortable: true, text: "", value: "symbol_name" },
+      { sortable: true, text: "", value: "type", width: "12%" },
+      { sortable: false, text: "24H", width: "12%", align: "center" },
+      { sortable: false, text: "4H", width: "12%", align: "center" },
+      { sortable: false, text: "1H", width: "12%", align: "center" },
+      { sortable: false, text: "30 Min", width: "12%", align: "center" },
+      { sortable: false, text: "15 Min", width: "12%", align: "center" },
+      { sortable: false, text: "5 Min", width: "12%", align: "center" },
     ],
     headersTableRight: [
       { sortable: false, width: "30px", text: "Symbol", value: "coin_symbol" },
